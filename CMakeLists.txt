@@ -21,12 +21,13 @@ project(TrinityCore)
 cmake_policy(SET CMP0135 NEW) # use local timestamps for FetchContent
 include(FetchContent)
 
-FetchContent_Declare(lua
-  URL https://www.lua.org/ftp/lua-5.4.4.tar.gz
-  URL_HASH MD5=bd8ce7069ff99a400efd14cf339a727b
+FetchContent_Declare(
+  lua
+  GIT_REPOSITORY https://github.com/lua/lua
+  GIT_TAG v5.4.4
 )
 FetchContent_MakeAvailable(lua)
-SET(LUA_ROOT ${lua_SOURCE_DIR}/src)
+SET(LUA_ROOT ${lua_SOURCE_DIR})
 file(GLOB SRC_LUA ${LUA_ROOT}/*.h ${LUA_ROOT}/*.c)
 LIST(REMOVE_ITEM SRC_LUA ${CMAKE_SOURCE_DIR}/../../misc/client-extensions/lua-5.1/src/lua.c)
 add_library ( liblua STATIC ${SRC_LUA} )
@@ -37,9 +38,10 @@ endif()
 #
 # sol2
 #
-FetchContent_Declare (sol2
+FetchContent_Declare(
+  sol2
   GIT_REPOSITORY https://github.com/ThePhD/sol2
-  GIT_TAG 4de99c5b41b64b7e654bf8e48b177e8414a756b7
+  GIT_TAG e8e122e9ce46f4f1c0b04003d8b703fe1b89755a
 )
 FetchContent_MakeAvailable (sol2)
 target_compile_definitions(sol2 INTERFACE SOL_NO_CHECK_NUMBER_PRECISION)
@@ -48,9 +50,10 @@ target_compile_definitions(sol2 INTERFACE SOL_NO_CHECK_NUMBER_PRECISION)
 # sourcemap
 #
 if(FALSE)
-  FetchContent_Declare (sourcemap
+  FetchContent_Declare(
+    sourcemap
     GIT_REPOSITORY https://github.com/tswow/sourcemap.cpp.git
-    GIT_TAG 79a901a367fdc1482306661eadfbb7d0ec50f2c2
+    GIT_TAG 1523872a09ed3478f5e3d4c0cd72c01e50116e40
   )
   FetchContent_MakeAvailable (sourcemap)
   file(GLOB SOURCEMAP_SRC
@@ -87,12 +90,10 @@ if(WIN32)
 endif()
 SET(TRACY_ON_DEMAND ON CACHE BOOL "" FORCE)
 SET(TRACY_ONLY_LOCALHOST OFF CACHE BOOL "" FORCE)
-FetchContent_Declare (
+FetchContent_Declare(
   tracy
   GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-  GIT_TAG a8511d357650282c6915f7aa9775e9c4945e42b5
-  GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+  GIT_TAG v0.8.2
 )
 FetchContent_MakeAvailable (tracy)
 target_compile_definitions(TracyClient
