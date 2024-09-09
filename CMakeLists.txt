@@ -18,7 +18,10 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 project(TrinityCore)
 
 #tswow-begin add tswow sources
-cmake_policy(SET CMP0135 NEW) # use local timestamps for FetchContent
+if (WIN32)
+  cmake_policy(SET CMP0135 NEW) # use local timestamps for FetchContent
+endif()
+
 include(FetchContent)
 
 FetchContent_Declare(lua
