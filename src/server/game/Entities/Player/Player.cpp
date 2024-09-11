@@ -27153,6 +27153,8 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 pet->SetName(new_name);
         }
 
+        pet->InitSummon();
+
         return nullptr;
     }
 
@@ -27244,6 +27246,8 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         pet->SetDuration(duration);
 
     //ObjectAccessor::UpdateObjectVisibility(pet);
+
+    pet->InitSummon();
 
     return pet;
 }
