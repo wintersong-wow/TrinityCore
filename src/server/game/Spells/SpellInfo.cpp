@@ -2184,7 +2184,7 @@ void SpellInfo::_LoadSpellSpecific()
             {
                 // Collection of all the seal family flags. No other paladin spell has any of those.
                 if (SpellFamilyFlags[1] & 0x26000C00
-                    || SpellFamilyFlags[0] & 0x0A000000)
+                    || SpellFamilyFlags[0] & 0x0A000000 || SpellFamilyFlags[2] & 0x00000200) // 0x00000200 is "Seal of the Crusader"
                     return SPELL_SPECIFIC_SEAL;
 
                 if (SpellFamilyFlags[0] & 0x00002190)
