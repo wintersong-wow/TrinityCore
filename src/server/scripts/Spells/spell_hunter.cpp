@@ -1155,7 +1155,9 @@ class spell_hun_tame_beast : public SpellScript
 
         if (Creature* target = GetExplTargetUnit()->ToCreature())
         {
-            if (target->GetLevel() > caster->GetLevel())
+            // [Beast Mastery] increases the level range by 1.
+            uint8 levelCoeff = (caster->HasAura(53270)) ? 1 : 0;
+            if (target->GetLevel() > caster->GetLevel() + levelCoeff)
                 return SPELL_FAILED_HIGHLEVEL;
 
             // use SMSG_PET_TAME_FAILURE?
