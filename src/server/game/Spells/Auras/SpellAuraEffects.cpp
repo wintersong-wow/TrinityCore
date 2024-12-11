@@ -1261,13 +1261,6 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                         args.AddSpellMod(SPELLVALUE_BASE_POINT0, aurEff->GetAmount());
                         target->CastSpell(target, 48418, args);
                     }
-                    // Survival of the Fittest
-                    if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DRUID, 961, 0))
-                    {
-                        CastSpellExtraArgs args(this);
-                        args.AddSpellMod(SPELLVALUE_BASE_POINT0, aurEff->GetSpellInfo()->GetEffect(EFFECT_2).CalcValue());
-                        target->CastSpell(target, 62069, args);
-                    }
                     break;
                 case FORM_MOONKIN:
                     // Master Shapeshifter - Moonkin
