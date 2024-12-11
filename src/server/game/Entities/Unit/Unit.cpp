@@ -7677,6 +7677,24 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     if (maxval)
         AddPct(TakenTotalMod, maxval);
 
+    // Blessing of Light dummy effects healing taken from Holy Light and Flash of Light
+    if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN && (spellProto->SpellFamilyFlags[0] & 0x00000000C0000000LL))
+    {
+        AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+        for (auto mDummyAura : mDummyAuras)
+        {
+            if (mDummyAura->GetSpellInfo()->SpellVisual[0] == 300) // Might be a better idea to give "Blessing of Light" spells their own family flag.
+            {
+                // Flash of Light
+                if ((spellProto->SpellFamilyFlags[0] & 0x0000000040000000LL) && mDummyAura->GetEffIndex() == 1)
+                    healamount += mDummyAura->GetAmount();
+                // Holy Light
+                else if ((spellProto->SpellFamilyFlags[0] & 0x0000000080000000LL) && mDummyAura->GetEffIndex() == 0)
+                    healamount += mDummyAura->GetAmount();
+            }
+        }
+    }
+
     // Nourish cast
     if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[1] & 0x2000000)
     {
