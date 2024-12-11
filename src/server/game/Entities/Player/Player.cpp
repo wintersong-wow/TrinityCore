@@ -24897,16 +24897,18 @@ void Player::InitGlyphsForLevel()
     uint8 level = GetLevel();
     uint32 value = 0;
 
-    // 0x3F = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 for 80 level
+    // 0x3F = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 for 60 level
     if (level >= 15)
-        value |= (0x01 | 0x02);
+        value |= 0x01;
+    if (level >= 20)
+        value |= 0x02;
     if (level >= 30)
         value |= 0x08;
-    if (level >= 50)
+    if (level >= 40)
         value |= 0x04;
-    if (level >= 70)
+    if (level >= 50)
         value |= 0x10;
-    if (level >= 80)
+    if (level >= 60)
         value |= 0x20;
 
     // @tswow-begin
