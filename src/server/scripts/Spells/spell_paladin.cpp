@@ -329,19 +329,6 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
         });
     }
 
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* target = GetTarget();
-        if (Unit* caster = GetCaster())
-            caster->CastSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, true);
-    }
-
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* target = GetTarget();
-        target->RemoveAura(SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, GetCasterGUID());
-    }
-
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
         return GetTarget()->GetPowerType() == POWER_MANA;
@@ -355,8 +342,6 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_pal_blessing_of_sanctuary::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_pal_blessing_of_sanctuary::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         DoCheckProc += AuraCheckProcFn(spell_pal_blessing_of_sanctuary::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_pal_blessing_of_sanctuary::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
