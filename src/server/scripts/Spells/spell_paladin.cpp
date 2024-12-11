@@ -212,54 +212,6 @@ class spell_pal_ardent_defender : public AuraScript
     }
 };
 
-// 31821 - Aura Mastery
-class spell_pal_aura_mastery : public AuraScript
-{
-    PrepareAuraScript(spell_pal_aura_mastery);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PALADIN_AURA_MASTERY_IMMUNE });
-    }
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetTarget()->CastSpell(GetTarget(), SPELL_PALADIN_AURA_MASTERY_IMMUNE, true);
-    }
-
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetTarget()->RemoveOwnedAura(SPELL_PALADIN_AURA_MASTERY_IMMUNE, GetCasterGUID());
-    }
-
-    void Register() override
-    {
-        AfterEffectApply += AuraEffectApplyFn(spell_pal_aura_mastery::HandleEffectApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_pal_aura_mastery::HandleEffectRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-// 64364 - Aura Mastery Immune
-class spell_pal_aura_mastery_immune : public AuraScript
-{
-    PrepareAuraScript(spell_pal_aura_mastery_immune);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PALADIN_CONCENTRACTION_AURA });
-    }
-
-    bool CheckAreaTarget(Unit* target)
-    {
-        return target->HasAura(SPELL_PALADIN_CONCENTRACTION_AURA, GetCasterGUID());
-    }
-
-    void Register() override
-    {
-        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_pal_aura_mastery_immune::CheckAreaTarget);
-    }
-};
-
 // 31884 - Avenging Wrath
 class spell_pal_avenging_wrath : public AuraScript
 {
@@ -1963,8 +1915,6 @@ class spell_pal_t8_2p_bonus : public AuraScript
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellScript(spell_pal_ardent_defender);
-    RegisterSpellScript(spell_pal_aura_mastery);
-    RegisterSpellScript(spell_pal_aura_mastery_immune);
     RegisterSpellScript(spell_pal_avenging_wrath);
     RegisterSpellScript(spell_pal_beacon_of_light);
     RegisterSpellScript(spell_pal_blessing_of_faith);
@@ -1986,7 +1936,6 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_illumination);
     RegisterSpellScript(spell_pal_immunities);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_concentraction_aura", SPELL_PALADIN_IMPROVED_CONCENTRACTION_AURA);
-    RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_devotion_aura", SPELL_PALADIN_IMPROVED_DEVOTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_sanctified_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_swift_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScript(spell_pal_improved_lay_of_hands);
