@@ -36,6 +36,7 @@
 
 enum PriestSpells
 {
+    SPELL_PRIEST_VAMPIRIC_TOUCH_PROC                = 34919,
     SPELL_PRIEST_BLESSED_RECOVERY_R1                = 27813,
     SPELL_PRIEST_DIVINE_AEGIS                       = 47753,
     SPELL_PRIEST_EMPOWERED_RENEW                    = 63544,
@@ -1135,13 +1136,19 @@ class spell_pri_vampiric_touch : public AuraScript
         return ValidateSpellInfo(
         {
             SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL,
-            SPELL_REPLENISHMENT
+            SPELL_PRIEST_VAMPIRIC_TOUCH_PROC
         });
     }
 
-    bool CheckDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    bool CheckProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return false;
+        Unit* triggerTarget = eventInfo.GetProcTarget();
+        if (!triggerTarget || !triggerTarget->IsAlive())
+            return false;
+        // only proc on shadowpriest damage
+        if (GetCasterGUID() != triggerTarget->GetGUID())
+            return false;
+        return true;
     }
 
     void HandleDispel(DispelInfo* /*dispelInfo*/)
@@ -1168,15 +1175,20 @@ class spell_pri_vampiric_touch : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(nullptr, SPELL_REPLENISHMENT, aurEff);
+        if (!eventInfo.GetDamageInfo())
+            return;
+        // energize amount
+        uint32 basepoints0 = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount());
+        CastSpellExtraArgs args(aurEff->GetBase());
+        args.AddSpellBP0(int32(basepoints0));
+        GetCaster()->CastSpell(GetCaster(), SPELL_PRIEST_VAMPIRIC_TOUCH_PROC, args);
     }
 
     void Register() override
     {
-        DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_vampiric_touch::CheckDummy, EFFECT_0, SPELL_AURA_DUMMY);
-
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_vampiric_touch::CheckProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_pri_vampiric_touch::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
         AfterDispel += AuraDispelFn(spell_pri_vampiric_touch::HandleDispel);
-        OnEffectProc += AuraEffectProcFn(spell_pri_vampiric_touch::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
     }
 };
 
