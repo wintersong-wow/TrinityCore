@@ -178,24 +178,8 @@ class spell_pal_ardent_defender : public AuraScript
         Unit* victim = GetTarget();
         int32 remainingHealth = victim->GetHealth() - dmgInfo.GetDamage();
         uint32 allowedHealth = victim->CountPctFromMaxHealth(35);
-        // If damage kills us
-        if (remainingHealth <= 0 && !victim->GetSpellHistory()->HasCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL))
-        {
-            // Cast healing spell, completely avoid damage
-            absorbAmount = dmgInfo.GetDamage();
 
-            float defenseSkillValue = victim->GetDefenseSkillValue();
-            // Max heal when defense skill denies critical hits from raid bosses
-            // Formula: max defense at level + 140 (rating from gear)
-            float reqDefForMaxHeal = victim->GetMaxSkillValueForLevel() + 140.0f;
-            float defenseFactor = std::min(1.0f, defenseSkillValue / reqDefForMaxHeal);
-
-            CastSpellExtraArgs args(aurEff);
-            args.AddSpellBP0(victim->CountPctFromMaxHealth(lroundf(_healPct * defenseFactor)));
-            victim->CastSpell(victim, PAL_SPELL_ARDENT_DEFENDER_HEAL, args);
-            victim->GetSpellHistory()->AddCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, std::chrono::minutes(2));
-        }
-        else if (remainingHealth < int32(allowedHealth))
+        if (remainingHealth < int32(allowedHealth))
         {
             // Reduce damage that brings us under 35% (or full damage if we are already under 35%) by x%
             uint32 damageToReduce = (victim->GetHealth() < allowedHealth)
