@@ -1404,20 +1404,26 @@ class spell_sha_shamanistic_rage : public AuraScript
         return ValidateSpellInfo({ SPELL_SHAMAN_SHAMANISTIC_RAGE_PROC });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
         Unit* target = GetTarget();
-        int32 amount = CalculatePct(static_cast<int32>(target->GetTotalAttackPowerValue(BASE_ATTACK)), aurEff->GetAmount());
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 energizeAmount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
         CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(amount);
+        args.AddSpellBP0(energizeAmount);
         target->CastSpell(target, SPELL_SHAMAN_SHAMANISTIC_RAGE_PROC, args);
     }
 
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_sha_shamanistic_rage::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        
     }
 };
 
