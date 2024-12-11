@@ -1955,6 +1955,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                         {
                             // Blood Elf
                             case RACE_BLOODELF:
+                            case RACE_HIGHELF:
                                 target->SetDisplayId(gender == GENDER_FEMALE ? 17830 : 17829);
                                 break;
                             // Orc
@@ -1963,6 +1964,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                 break;
                             // Troll
                             case RACE_TROLL:
+                            case RACE_FOREST_TROLL:
                                 target->SetDisplayId(gender == GENDER_FEMALE ? 10134 : 10135);
                                 break;
                             // Tauren
