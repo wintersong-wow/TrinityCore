@@ -3161,12 +3161,25 @@ void Spell::EffectWeaponDmg()
             // Devastate (player ones)
             if (m_spellInfo->SpellFamilyFlags[1] & 0x40)
             {
-                unitCaster->CastSpell(unitTarget, 58567, true);
+                uint32 sunderId = 0;
+                switch (m_spellInfo->GetRank())
+                {
+                    case 2:
+                        sunderId = 11597;
+                        unitCaster->CastSpell(unitTarget, sunderId, true);  // Devastate, Rank 2
+                        break;
+                    case 1:
+                    default:
+                        sunderId = 11596;
+                        unitCaster->CastSpell(unitTarget, sunderId, true); // Devastate, Rank 1
+                        break;
+                }
+                
                 // 58388 - Glyph of Devastate dummy aura.
-                if (unitCaster->HasAura(58388))
-                    unitCaster->CastSpell(unitTarget, 58567, true);
+                if (unitCaster->HasAura(58388) && sunderId != 0)
+                    unitCaster->CastSpell(unitTarget, sunderId, true);
 
-                if (Aura* aur = unitTarget->GetAura(58567, unitCaster->GetGUID()))
+                if (Aura* aur = unitTarget->GetAura(sunderId, unitCaster->GetGUID()))
                     fixed_bonus += (aur->GetStackAmount() - 1) * CalculateDamage(m_spellInfo->GetEffect(EFFECT_2)); // subtract 1 so fixed bonus is not applied twice
             }
             else if (m_spellInfo->SpellFamilyFlags[0] & 0x8000000) // Mocking Blow
