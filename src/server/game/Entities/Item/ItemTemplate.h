@@ -316,7 +316,7 @@ enum ItemClass : uint8
     ITEM_CLASS_GLYPH                            = 16
 };
 
-#define MAX_ITEM_CLASS                            17
+#define MAX_ITEM_CLASS                            18
 
 enum ItemSubclassConsumable
 {
@@ -446,10 +446,11 @@ enum ItemSubclassTradeGoods
     ITEM_SUBCLASS_ENCHANTING                    = 12,
     ITEM_SUBCLASS_MATERIAL                      = 13,
     ITEM_SUBCLASS_ARMOR_ENCHANTMENT             = 14,
-    ITEM_SUBCLASS_WEAPON_ENCHANTMENT            = 15
+    ITEM_SUBCLASS_WEAPON_ENCHANTMENT            = 15,
+    ITEM_SUBCLASS_WOOD                          = 16
 };
 
-#define MAX_ITEM_SUBCLASS_TRADE_GOODS             16
+#define MAX_ITEM_SUBCLASS_TRADE_GOODS             17
 
 enum ItemSubclassGeneric
 {
