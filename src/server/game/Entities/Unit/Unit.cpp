@@ -7287,13 +7287,6 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                                 crit_chance += aura->GetAmount();
                             break;
                         }
-                        // Exorcism
-                        else if (spellInfo->GetCategory() == 19)
-                        {
-                            if (GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
-                                return 100.0f;
-                            break;
-                        }
                         break;
                     case SPELLFAMILY_SHAMAN:
                         // Lava Burst
