@@ -3101,12 +3101,12 @@ void ObjectMgr::LoadItemTemplates()
         }
 
         itemTemplate.Armor          = uint32(fields[56].GetUInt16());
-        itemTemplate.HolyRes        = uint32(fields[57].GetUInt8());
-        itemTemplate.FireRes        = uint32(fields[58].GetUInt8());
-        itemTemplate.NatureRes      = uint32(fields[59].GetUInt8());
-        itemTemplate.FrostRes       = uint32(fields[60].GetUInt8());
-        itemTemplate.ShadowRes      = uint32(fields[61].GetUInt8());
-        itemTemplate.ArcaneRes      = uint32(fields[62].GetUInt8());
+        itemTemplate.HolyRes        = uint32(fields[57].GetInt8());
+        itemTemplate.FireRes        = uint32(fields[58].GetInt8());
+        itemTemplate.NatureRes      = uint32(fields[59].GetInt8());
+        itemTemplate.FrostRes       = uint32(fields[60].GetInt8());
+        itemTemplate.ShadowRes      = uint32(fields[61].GetInt8());
+        itemTemplate.ArcaneRes      = uint32(fields[62].GetInt8());
         itemTemplate.Delay          = uint32(fields[63].GetUInt16());
         itemTemplate.AmmoType       = uint32(fields[64].GetUInt8());
         itemTemplate.RangedModRange = fields[65].GetFloat();
@@ -3704,12 +3704,12 @@ void ObjectMgr::LoadCustomItemTemplates()
         }
 
         itemTemplate->Armor = uint32(fields[56].GetUInt16());
-        itemTemplate->HolyRes = uint32(fields[57].GetUInt8());
-        itemTemplate->FireRes = uint32(fields[58].GetUInt8());
-        itemTemplate->NatureRes = uint32(fields[59].GetUInt8());
-        itemTemplate->FrostRes = uint32(fields[60].GetUInt8());
-        itemTemplate->ShadowRes = uint32(fields[61].GetUInt8());
-        itemTemplate->ArcaneRes = uint32(fields[62].GetUInt8());
+        itemTemplate->HolyRes = uint32(fields[57].GetInt8());
+        itemTemplate->FireRes = uint32(fields[58].GetInt8());
+        itemTemplate->NatureRes = uint32(fields[59].GetInt8());
+        itemTemplate->FrostRes = uint32(fields[60].GetInt8());
+        itemTemplate->ShadowRes = uint32(fields[61].GetInt8());
+        itemTemplate->ArcaneRes = uint32(fields[62].GetInt8());
         itemTemplate->Delay = uint32(fields[63].GetUInt16());
         itemTemplate->AmmoType = uint32(fields[64].GetUInt8());
         itemTemplate->RangedModRange = fields[65].GetFloat();
