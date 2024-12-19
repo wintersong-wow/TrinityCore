@@ -468,30 +468,6 @@ void Spell::EffectSchoolDMG()
                 }
                 break;
             }
-            case SPELLFAMILY_PRIEST:
-            {
-                if (!unitCaster)
-                    break;
-
-                // Improved Mind Blast (Mind Blast in shadow form bonus)
-                if (unitCaster->GetShapeshiftForm() == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags[0] & 0x00002000))
-                {
-                    Unit::AuraEffectList const& ImprMindBlast = unitCaster->GetAuraEffectsByType(SPELL_AURA_ADD_FLAT_MODIFIER);
-                    for (Unit::AuraEffectList::const_iterator i = ImprMindBlast.begin(); i != ImprMindBlast.end(); ++i)
-                    {
-                        if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_PRIEST &&
-                            ((*i)->GetSpellInfo()->SpellIconID == 95))
-                        {
-                            // Mind Trauma
-                            int32 const chance = (*i)->GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(unitCaster);
-                            if (roll_chance_i(chance))
-                                unitCaster->CastSpell(unitTarget, 48301, true);
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
             case SPELLFAMILY_DRUID:
             {
                 if (!unitCaster)
