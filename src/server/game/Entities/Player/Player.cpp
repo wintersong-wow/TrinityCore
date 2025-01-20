@@ -8115,8 +8115,8 @@ void Player::CastItemCombatSpell(DamageInfo const& damageInfo, Item* item, ItemT
             // Apply spell mods
             ApplySpellMod(pEnchant->EffectArg[s], SPELLMOD_CHANCE_OF_SUCCESS, chance);
 
-            // Shiv has 100% chance to apply the poison
-            if (FindCurrentSpellBySpellId(5938) && e_slot == TEMP_ENCHANTMENT_SLOT)
+            // Shiv and Poisoned Throw has 100% chance to apply the poison
+            if ((FindCurrentSpellBySpellId(5938) || FindCurrentSpellBySpellId(81278)) && e_slot == TEMP_ENCHANTMENT_SLOT)
                 chance = 100.0f;
 
             if (roll_chance_f(chance))
