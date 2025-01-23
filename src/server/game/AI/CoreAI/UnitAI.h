@@ -257,6 +257,10 @@ class TC_GAME_API UnitAI
 
         virtual std::string GetDebugInfo() const;
 
+      protected:
+        // Used only for PetAI at the moment
+        bool m_bMeleeAttack;
+
     private:
         UnitAI(UnitAI const& right) = delete;
         UnitAI& operator=(UnitAI const& right) = delete;
