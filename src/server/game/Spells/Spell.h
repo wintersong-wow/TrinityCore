@@ -343,6 +343,11 @@ class TC_GAME_API Spell
         SpellCastResult CheckCast(bool strict, uint32* param1 = nullptr, uint32* param2 = nullptr);
         SpellCastResult CheckPetCast(Unit* target);
 
+        bool isSuccessCast() const
+        {
+            return m_successCast;
+        }
+
         // handlers
         void handle_immediate();
         uint64 handle_delayed(uint64 t_offset);
@@ -508,6 +513,7 @@ class TC_GAME_API Spell
         bool m_canReflect;                                  // can reflect this spell?
         bool m_autoRepeat;
         uint8 m_runesState;
+        bool m_successCast = false;
 
         uint8 m_delayAtDamageCount;
         bool IsDelayableNoMore()
