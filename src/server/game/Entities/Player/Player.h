@@ -159,14 +159,16 @@ struct SpellModifier
 };
 
 // @tswow-begin (Using Rochet2/Transmog)
+typedef std::array<std::unordered_set<uint32>, TRANSMOG_TYPE_COUNT> AppearanceContainer;
 #ifdef PRESETS
 typedef std::map<uint8, uint32> PresetslotMapType;
 struct PresetData
 {
     std::string name;
     PresetslotMapType slotMap; // slotMap[slotId] = entry
+    SetTransmogs data;
 };
-typedef std::map<uint8, PresetData> PresetMapType;
+typedef std::map<uint8 /*presetid*/, PresetData> PresetMapType;
 #endif
 // @tswow-end
 
@@ -758,6 +760,10 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS,
+    PLAYER_LOGIN_QUERY_LOAD_TRANSMOG,
+#ifdef PRESETS
+    PLAYER_LOGIN_QUERY_LOAD_TRANSMOG_SETS,
+#endif
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -2238,6 +2244,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::string GetCoordsMapAreaAndZoneString() const;
 
 // @tswow-begin (Using Rochet2/Transmog)
+        BasicEvent* pendingTransmogCheck = nullptr;
+        AppearanceContainer transmogrification_appearances;
 #ifdef PRESETS
         PresetMapType presetMap; // presetMap[presetId] = presetData
 #endif

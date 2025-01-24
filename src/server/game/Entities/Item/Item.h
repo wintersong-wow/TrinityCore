@@ -77,7 +77,12 @@ class TC_GAME_API Item : public Object
         void SetOwnerGUID(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
+        void SetBinding(bool val)
+        {
+            ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val);
+            if (val)
+                Transmogrification::instance().AddToCollection(GetOwner(), this);
+        }
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
         bool IsBoundAccountWide() const { return GetTemplate()->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT); }
         bool IsBindedNotWith(Player const* player) const;
@@ -202,6 +207,23 @@ class TC_GAME_API Item : public Object
 
         // @tswow-begin (Using Rochet2/Transmog)
         uint32 transmog = 0;
+        uint32 enchant  = 0;
+        void SetTransmog(uint32 entry)
+        {
+            transmog = GetEntry() == entry ? 0 : entry;
+        }
+        void SetEnchant(uint32 entry)
+        {
+            enchant = GetEnchantmentId(PERM_ENCHANTMENT_SLOT) == entry ? 0 : entry;
+        }
+        uint32 GetTransmog() const
+        {
+            return transmog;
+        }
+        uint32 GetEnchant() const
+        {
+            return enchant;
+        }
         // @tswow-end
 
         void BuildUpdate(UpdateDataMapType&) override;
