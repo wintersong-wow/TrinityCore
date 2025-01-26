@@ -214,55 +214,6 @@ class spell_pri_blessed_recovery : public AuraScript
     }
 };
 
-// -64127 - Body and Soul
-class spell_pri_body_and_soul : public AuraScript
-{
-    PrepareAuraScript(spell_pri_body_and_soul);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo(
-        {
-            SPELL_PRIEST_BODY_AND_SOUL_POISON_TRIGGER,
-            SPELL_PRIEST_ABOLISH_DISEASE
-        });
-    }
-
-    void HandleProcTriggerSpell(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        // Proc only on Power Word: Shield
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !(spellInfo->SpellFamilyFlags[0] & 0x00000001))
-        {
-            PreventDefaultAction();
-            return;
-        }
-    }
-
-    void HandleProcDummy(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        // Proc only on self casted abolish disease
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
-            return;
-
-        Unit* caster = eventInfo.GetActor();
-        if (spellInfo->Id != SPELL_PRIEST_ABOLISH_DISEASE || caster != eventInfo.GetProcTarget())
-            return;
-
-        if (roll_chance_i(aurEff->GetAmount()))
-            caster->CastSpell(caster, SPELL_PRIEST_BODY_AND_SOUL_POISON_TRIGGER, aurEff);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_pri_body_and_soul::HandleProcTriggerSpell, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        OnEffectProc += AuraEffectProcFn(spell_pri_body_and_soul::HandleProcDummy, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
 // -34861 - Circle of Healing
 class spell_pri_circle_of_healing : public SpellScript
 {
@@ -1310,7 +1261,6 @@ void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_aq_3p_bonus);
     RegisterSpellScript(spell_pri_blessed_recovery);
-    RegisterSpellScript(spell_pri_body_and_soul);
     RegisterSpellScript(spell_pri_circle_of_healing);
     RegisterSpellScript(spell_pri_divine_aegis);
     RegisterSpellScript(spell_pri_divine_hymn);
