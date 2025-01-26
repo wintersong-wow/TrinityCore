@@ -723,31 +723,6 @@ class spell_dru_idol_lifebloom : public AuraScript
     }
 };
 
-// 29166 - Innervate
-class spell_dru_innervate : public AuraScript
-{
-    PrepareAuraScript(spell_dru_innervate);
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (!aurEff->GetTotalTicks())
-        {
-            amount = 0;
-            return;
-        }
-
-        if (Unit* caster = GetCaster())
-            amount = int32(CalculatePct(caster->GetCreatePowerValue(POWER_MANA), amount) / aurEff->GetTotalTicks());
-        else
-            amount = 0;
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_innervate::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE);
-    }
-};
-
 // -5570 - Insect Swarm
 class spell_dru_insect_swarm : public AuraScript
 {
@@ -1943,7 +1918,6 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_glyph_of_starfire);
     RegisterSpellScript(spell_dru_glyph_of_starfire_dummy);
     RegisterSpellScript(spell_dru_idol_lifebloom);
-    RegisterSpellScript(spell_dru_innervate);
     RegisterSpellScript(spell_dru_insect_swarm);
     RegisterSpellScript(spell_dru_leader_of_the_pack);
     RegisterSpellScript(spell_dru_lifebloom);
