@@ -1920,13 +1920,18 @@ void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Pos
 
 void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, ConditionContainer* condList, bool isChainHeal)
 {
+    bool isBouncingFar =
+        (m_spellInfo->HasAttribute(SPELL_ATTR4_AREA_TARGET_CHAIN) || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE ||
+         m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC);
+
     // max dist for jump target selection
     float jumpRadius = 0.0f;
     switch (m_spellInfo->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_RANGED:
-            // 7.5y for multi shot
-            jumpRadius = 7.5f;
+            // 10y for multi shot
+            jumpRadius    = 10.0f;
+            isBouncingFar = true;
             break;
         case SPELL_DAMAGE_CLASS_MELEE:
             // 5y for swipe, cleave and similar
@@ -1942,11 +1947,6 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
                 jumpRadius = 10.0f;
             break;
     }
-
-    // chain lightning/heal spells and similar - allow to jump at larger distance and go out of los
-    bool isBouncingFar = (m_spellInfo->HasAttribute(SPELL_ATTR4_AREA_TARGET_CHAIN)
-        || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE
-        || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC);
 
     // max dist which spell can reach
     float searchRadius = jumpRadius;
