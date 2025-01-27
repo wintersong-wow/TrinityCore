@@ -412,7 +412,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
     if (me->Attack(target, true))
     {
-        me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT); // on player pets, this flag indicates we're actively going after a target - that's what we're doing, so set it
+        me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT); // on player pets, this flag indicates we're actively going after a
+                                                  // target - that's what we're doing, so set it
         // Play sound to let the player know the pet is attacking something it picked on its own
         if (me->HasReactState(REACT_AGGRESSIVE) && !me->GetCharmInfo()->IsCommandAttack())
             me->SendPetAIReaction(me->GetGUID());
@@ -428,9 +429,12 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
             // Pets with ranged attacks should not care about the chase angle at all.
             float chaseDistance = m_bMeleeAttack ? 0.f : me->GetPetChaseDistance();
-            float angle = chaseDistance == 0.f ? float(M_PI) : 0.f;
+            float angle = chaseDistance == 0.f && target->GetTypeId() != TYPEID_PLAYER && !target->IsPet() ? float(M_PI) : 0.f;
             float tolerance = chaseDistance == 0.f ? float(M_PI_4) : float(M_PI * 2);
-            me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, chaseDistance), ChaseAngle(angle, tolerance));
+            if (m_bMeleeAttack) // Pass angle and tolerance only for melee chasing, otherwise imp bugs out.
+                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, chaseDistance), ChaseAngle(angle, tolerance));
+            else
+                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, chaseDistance));
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {

@@ -3064,6 +3064,9 @@ float Creature::GetPetChaseDistance() const
         }
     }
 
+    if (GetEntry() == 416 || GetEntry() == 510 || GetEntry() == 37994) // Imp // Water Elemental
+        range = std::max(20.0f, range);
+
     return range;
 }
 
