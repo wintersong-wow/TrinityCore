@@ -5935,27 +5935,21 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defense)
 {
-    int32 plevel = GetLevel();                              // if defense than victim == attacker
-    int32 greylevel = Trinity::XP::GetGrayLevel(this, plevel);
-    int32 moblevel = victim->GetLevelForTarget(this);
+    const uint16 skillId = (defense ? SKILL_DEFENSE : GetWeaponSkillIdForAttack(attType));
+    const uint16 skill   = GetPureSkillValue(skillId);
+    const uint16 cap     = GetPureMaxSkillValue(skillId);
+    const int32 room     = int32(cap - skill);
 
-    if (moblevel > plevel + 5)
-        moblevel = plevel + 5;
-
-    int32 lvldif = moblevel - greylevel;
-    if (lvldif < 3)
-        lvldif = 3;
-
-    int32 skilldif = 5 * plevel - int32(defense ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
-    if (skilldif <= 0)
+    // Max skill reached: nothing to gain
+    if (room <= 0)
         return;
 
-    float chance = float(3 * lvldif * skilldif) / plevel;
-    if (!defense)
-        if (GetClass() == CLASS_WARRIOR || GetClass() == CLASS_ROGUE)
-            chance += chance * 0.02f * GetStat(STAT_INTELLECT);
+    // The farther player is from the cap, the easier it gets to level up the skill
+    float chance = ((float(std::max(1, (room / 5))) / (cap / 5)) * 100);
 
-    chance = chance < 1.0f ? 1.0f : chance;                 //minimum chance to increase skill is 1%
+    // Weapon skills: increase chance by intellect
+    if (!defense)
+        chance += ((chance * 0.02f) * GetStat(STAT_INTELLECT));
 
     if (roll_chance_f(chance))
     {
@@ -5964,6 +5958,20 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         else
             UpdateWeaponSkill(victim, attType);
     }
+    else
+        return;
+}
+
+uint16 Player::GetWeaponSkillIdForAttack(WeaponAttackType attType) const
+{
+    Item* item = GetWeaponForAttack(attType, true);
+
+    // unarmed only with base attack
+    if (attType != BASE_ATTACK && !item)
+        return 0;
+
+    // weapon skill or (unarmed for base attack)
+    return (item ? item->GetSkill() : uint16(SKILL_UNARMED));
 }
 
 void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
