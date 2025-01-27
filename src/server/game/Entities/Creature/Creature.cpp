@@ -608,6 +608,19 @@ bool Creature::InitEntry(uint32 entry, CreatureData const* data /*= nullptr*/)
 
     // Will set UNIT_FIELD_BOUNDINGRADIUS and UNIT_FIELD_COMBATREACH
     SetObjectScale(GetNativeObjectScale());
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
+    if (cFamily && cFamily->MinScale > 0.0f && IsHunterPet())
+    {
+        float scale;
+        if (GetLevel() >= cFamily->MaxScaleLevel)
+            scale = cFamily->MaxScale;
+        else if (GetLevel() <= cFamily->MinScaleLevel)
+            scale = cFamily->MinScale;
+        else
+            scale = cFamily->MinScale + float(GetLevel() - cFamily->MinScaleLevel) / cFamily->MaxScaleLevel *
+                                            (cFamily->MaxScale - cFamily->MinScale);
+        SetObjectScale(scale);
+    }
 
     SetHoverHeight(cinfo->HoverHeight);
 
