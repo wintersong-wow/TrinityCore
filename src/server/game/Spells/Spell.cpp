@@ -1939,13 +1939,7 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
             break;
         case SPELL_DAMAGE_CLASS_NONE:
         case SPELL_DAMAGE_CLASS_MAGIC:
-            // 12.5y for chain heal spell since 3.2 patch
-            if (isChainHeal)
-                jumpRadius = 12.5f;
-            // 10y as default for magic chain spells
-            else
-                jumpRadius = 10.0f;
-            break;
+            jumpRadius = 10.0f;
     }
 
     // max dist which spell can reach
