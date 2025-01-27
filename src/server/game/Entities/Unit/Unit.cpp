@@ -2674,35 +2674,48 @@ uint32 Unit::GetDefenseSkillValue(Unit const* target) const
 
 float Unit::GetUnitDodgeChance(WeaponAttackType attType, Unit const* victim) const
 {
-    int32 const attackerWeaponSkill = GetWeaponSkillValue(attType, victim);
+    int32 const attackerWeaponSkill         = GetWeaponSkillValue(attType, victim);
     int32 const victimMaxSkillValueForLevel = victim->GetMaxSkillValueForLevel(this);
-    int32 const skillDiff = victimMaxSkillValueForLevel - attackerWeaponSkill;
-
-    uint32 const isPlayerOrPet = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    int32 const skillDiff                   = victimMaxSkillValueForLevel - attackerWeaponSkill;
 
     float chance = 0.0f;
+    // float skillBonus = 0.0f;
 
-    float skillBonus = 0.04f;
-    if (victim->GetTypeId() == TYPEID_UNIT)
-        chance += 5.0f;
-    if (!isPlayerOrPet && skillDiff > 0)
-    {
-        skillBonus = 0.1f;
-    }
-
+    // Base chance
     if (victim->GetTypeId() == TYPEID_PLAYER)
     {
         chance = victim->GetFloatValue(PLAYER_DODGE_PERCENTAGE);
+        // skillBonus = 0.04f * skillDiff;
     }
     else
     {
         if (!victim->IsTotem())
         {
+            chance = 5.0f;
             chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+
+            // if (skillDiff <= 10)
+            //     skillBonus = skillDiff * 0.1f;
+            // else
+            //     skillBonus = 1.0f + (skillDiff - 10) * 0.1f;
         }
     }
 
-    chance += (skillDiff * skillBonus);
+    // Own chance appears to be zero / below zero / unmeaningful for some reason (debuffs?): skip calculation, unit is
+    // incapable
+    if (chance < 0.005f)
+        return 0.0f;
+
+    // Skill difference can be negative (and reduce our chance to mitigate an attack), which means:
+    // a) Attacker's level is higher
+    // b) Attacker has +skill bonuses
+    bool const isPlayerOrPet = victim->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    // Defense/weapon skill factor: for players and NPCs
+    float factor = 0.04f;
+    // NPCs gain additional bonus dodge chance based on positive skill difference
+    if (!isPlayerOrPet && skillDiff > 0)
+        factor = 0.1f;
+    chance += (skillDiff * factor);
 
     // Reduce enemy dodge chance by SPELL_AURA_MOD_COMBAT_RESULT_CHANCE
     chance += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_COMBAT_RESULT_CHANCE, VICTIMSTATE_DODGE);
@@ -2720,21 +2733,14 @@ float Unit::GetUnitDodgeChance(WeaponAttackType attType, Unit const* victim) con
 
 float Unit::GetUnitParryChance(WeaponAttackType attType, Unit const* victim) const
 {
-    int32 const attackerWeaponSkill = GetWeaponSkillValue(attType, victim);
+    int32 const attackerWeaponSkill         = GetWeaponSkillValue(attType, victim);
     int32 const victimMaxSkillValueForLevel = victim->GetMaxSkillValueForLevel(this);
-    int32 const skillDiff = victimMaxSkillValueForLevel - attackerWeaponSkill;
-    uint32 const isPlayerOrPet = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    int32 const skillDiff                   = victimMaxSkillValueForLevel - attackerWeaponSkill;
 
     float chance = 0.0f;
-    float skillBonus = 0.04f;
-    if (!isPlayerOrPet && skillDiff > 0)
-    {
-        if (skillDiff > 10)
-            skillBonus = 0.6f;
-        else
-            skillBonus = 0.1f;
-    }
+    // float skillBonus = 0.0f;
 
+    // Base chance
     if (Player const* playerVictim = victim->ToPlayer())
     {
         if (playerVictim->CanParry())
@@ -2745,18 +2751,49 @@ float Unit::GetUnitParryChance(WeaponAttackType attType, Unit const* victim) con
 
             if (tmpitem)
                 chance = playerVictim->GetFloatValue(PLAYER_PARRY_PERCENTAGE);
+
+            // skillBonus = 0.04f * skillDiff;
         }
     }
     else
     {
-        if (!victim->IsTotem() && !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY))
+        if (!victim->IsTotem() &&
+            !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY))
         {
             chance = 5.0f;
             chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
+
+            // if (skillDiff <= 10)
+            //     skillBonus = skillDiff * 0.1f;
+            // else
+            //     skillBonus = 1.0f + (skillDiff - 10) * 1.6f;
         }
     }
 
-    chance += (skillDiff * skillBonus);
+    // Own chance appears to be zero / below zero / unmeaningful for some reason (debuffs?): skip calculation, unit is
+    // incapable
+    if (chance < 0.005f)
+        return 0.0f;
+
+    // Skill difference can be negative (and reduce our chance to mitigate an attack), which means:
+    // a) Attacker's level is higher
+    // b) Attacker has +skill bonuses
+    bool const isPlayerOrPet = victim->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    // Defense/weapon skill factor: for players and NPCs
+    float factor = 0.04f;
+    // NPCs gain additional bonus parry chance based on positive skill difference (same value as bonus miss rate)
+    if (!isPlayerOrPet && skillDiff > 0)
+    {
+        if (skillDiff > 10)
+            factor = 0.6f; // Pre-WotLK: 0.2 additional factor for each level above 2
+        else
+            factor = 0.1f;
+    }
+    chance += (skillDiff * factor);
+
+    // None present in 3.3.5 as far as I can see but added for visibility
+    // Reduce enemy parry chance by SPELL_AURA_MOD_COMBAT_RESULT_CHANCE
+    chance += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_COMBAT_RESULT_CHANCE, VICTIMSTATE_PARRY);
 
     // Reduce parry chance by attacker expertise rating
     if (GetTypeId() == TYPEID_PLAYER)
@@ -2770,31 +2807,27 @@ float Unit::GetUnitMissChance() const
 {
     float miss_chance = 5.0f;
 
+    // Totems have no inherit miss chance
+    if (IsTotem())
+        miss_chance = 0.0f;
+
     if (Player const* player = ToPlayer())
         miss_chance += player->GetMissPercentageFromDefense();
     // @tswow-begin
-    FIRE(
-          Unit,OnCalcMissChance
-        , TSUnit(const_cast<Unit*>(this))
-        , TSMutableNumber<float>(&miss_chance)
-    );
+    FIRE(Unit, OnCalcMissChance, TSUnit(const_cast<Unit*>(this)), TSMutableNumber<float>(&miss_chance));
     // @tswow-end
     return miss_chance;
 }
 
 float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) const
 {
-    int32 const attackerWeaponSkill = GetWeaponSkillValue(attType, victim);
+    int32 const attackerWeaponSkill         = GetWeaponSkillValue(attType, victim);
     int32 const victimMaxSkillValueForLevel = victim->GetMaxSkillValueForLevel(this);
-    int32 const skillDiff = victimMaxSkillValueForLevel - attackerWeaponSkill;
-
-    uint32 const isPlayerOrPet = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    int32 const skillDiff                   = victimMaxSkillValueForLevel - attackerWeaponSkill;
 
     float chance = 0.0f;
-    float skillBonus = 0.04f;
-    if (!isPlayerOrPet && skillDiff > 0)
-        skillBonus = 0.0f;
-
+    // float skillBonus = 0.0f;
+    //  Base chance
     if (Player const* playerVictim = victim->ToPlayer())
     {
         if (playerVictim->CanBlock())
@@ -2803,19 +2836,44 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
             if (tmpitem && !tmpitem->IsBroken() && tmpitem->GetTemplate()->Block)
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
+                // skillBonus = 0.04f * skillDiff;
             }
         }
     }
     else
     {
-        if (!victim->IsTotem() && !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
+        if (!victim->IsTotem() &&
+            !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
         {
             chance = 5.0f;
             chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
+
+            // if (skillDiff <= 10)
+            //     skillBonus = skillDiff * 0.1f;
+            // else
+            //     skillBonus = 1.0f + (skillDiff - 10) * 0.1f;
         }
     }
 
-    chance += (skillDiff * skillBonus);
+    // Own chance appears to be zero / below zero / unmeaningful for some reason (debuffs?): skip calculation, unit is
+    // incapable
+    if (chance < 0.005f)
+        return 0.0f;
+
+    // Skill difference can be negative (and reduce our chance to mitigate an attack), which means:
+    // a) Attacker's level is higher
+    // b) Attacker has +skill bonuses
+    bool const isPlayerOrPet = victim->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    // Defense/weapon skill factor: for players and NPCs
+    float factor = 0.04f;
+    // NPCs cannot gain bonus block chance based on positive skill difference
+    if (!isPlayerOrPet && skillDiff > 0)
+        factor = 0.0f;
+    chance += (skillDiff * factor);
+
+    // None present in 3.3.5 as far as I can see but added for visibility
+    // Reduce enemy block chance by SPELL_AURA_MOD_COMBAT_RESULT_CHANCE
+    chance += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_COMBAT_RESULT_CHANCE, VICTIMSTATE_BLOCKS);
     return std::max(chance, 0.0f);
 }
 
@@ -2857,10 +2915,16 @@ float Unit::GetUnitCriticalChanceDone(WeaponAttackType attackType) const
 float Unit::GetUnitCriticalChanceTaken(Unit const* attacker, WeaponAttackType attackType, float critDone) const
 {
     int32 const attackerWeaponSkill = attacker->GetWeaponSkillValue(attackType, this);
-    int32 const victimDefenseSkill = GetDefenseSkillValue(attacker);
-    int32 const skillDiff = victimDefenseSkill - attackerWeaponSkill;
+    int32 const victimDefenseSkill  = GetDefenseSkillValue(attacker);
+    int32 const skillDiff           = victimDefenseSkill - attackerWeaponSkill;
+    // In case we have bonus wep skill and we need to suppress crit against higher level NPCs
+    int32 const minSkillValue =
+        attacker->GetMaxSkillValueForLevel(this) < attacker->GetWeaponSkillValue(attackType, this) ?
+            attacker->GetMaxSkillValueForLevel(this) :
+            attacker->GetWeaponSkillValue(attackType, this);
+    int32 const cappedSkillDiff = victimDefenseSkill - minSkillValue;
 
-    float skillBonus = 0.0f;
+    // float skillBonus = 0.0f;
     float chance = critDone;
 
     // flat aura mods
@@ -2871,29 +2935,45 @@ float Unit::GetUnitCriticalChanceTaken(Unit const* attacker, WeaponAttackType at
 
     // reduce crit chance from Rating for players
     if (attacker->CanApplyResilience())
-        Unit::ApplyResilience(this, &chance, nullptr, false, (attackType == RANGED_ATTACK ? CR_CRIT_TAKEN_RANGED : CR_CRIT_TAKEN_MELEE));
+        Unit::ApplyResilience(this, &chance, nullptr, false,
+                              (attackType == RANGED_ATTACK ? CR_CRIT_TAKEN_RANGED : CR_CRIT_TAKEN_MELEE));
 
     // applied after resilience
     chance += GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
 
     // Apply crit chance from defense skill
-    if (GetTypeId() == TYPEID_PLAYER)
-        skillBonus = -skillDiff * 0.04f;
-    else
-    {
-        skillBonus = -skillDiff * 0.12f;
-        if (skillDiff >= 15)
-            skillBonus -= 3.0f;
-    }
+    // Skill difference can be both negative and positive.
+    // a) Positive means that attacker's level is higher or additional weapon +skill bonuses
+    // b) Negative means that victim's level is higher or additional +defense bonuses
+    int32 diff = -skillDiff;
 
-    chance += skillBonus;
+    // Both vMangos and cMangos, against higher leveled NPCs, have 0.2f factor of crit suppression
+    // If we over level the NPCs, we have 0.04f factor of crit addition in vMangos and 0.2f in cMangos
+    // Choose the former to "nerf" the power level?
+    const bool vsPlayerOrPet = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+    // Weapon skill factor: for players and NPCs
+    float factor = 0.04f;
+    // Crit suppression against NPCs with higher level
+    if (!vsPlayerOrPet && diff < 0)
+    { // decrease by 1% of crit per level of target
+        factor = 0.2f;
+        diff   = -cappedSkillDiff; // weapon skill does not benefit crit suppression% vs NPCs
+    }
+    chance += (diff * factor);
+
+    // if (GetTypeId() == TYPEID_PLAYER)
+    //     skillBonus = -skillDiff * 0.04f;
+    // else
+    // {
+    //     skillBonus = -skillDiff * 0.12f;
+    //     if (skillDiff >= 15)
+    //         skillBonus -= 3.0f;
+    // }
+
     // @tswow-begin
-    FIRE(Unit,OnCalcMeleeCrit
-        , TSUnit(const_cast<Unit*>(attacker))
-        , TSUnit(const_cast<Unit*>(this))
-        , TSMutableNumber<float>(&chance)
-        , attackType
-    );
+    FIRE(Unit, OnCalcMeleeCrit, TSUnit(const_cast<Unit*>(attacker)), TSUnit(const_cast<Unit*>(this)),
+         TSMutableNumber<float>(&chance), attackType);
     // @tswow-end
     return std::max(chance, 0.f);
 }
@@ -12378,7 +12458,7 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
     if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR7_CANT_MISS))
         return 0.f;
 
-    //calculate miss chance
+    // calculate miss chance
     float missChance = victim->GetUnitMissChance();
 
     // Check if dual wielding, add additional miss penalty - when mainhand has on next swing spell, offhand doesnt
@@ -12387,17 +12467,42 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
         missChance += 19.0f;
 
     // bonus from skills is 0.04%
-    //miss_chance -= skillDiff * 0.04f;
+    // miss_chance -= skillDiff * 0.04f;
     int32 diff = -skillDiff;
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-        missChance += diff > 0 ? diff * 0.04f : diff * 0.02f;
-    else
+    // Skill difference can be both negative and positive. Positive difference means that:
+    // a) Victim's level is higher
+    // b) Victim has additional defense skill bonuses
+    const bool vsPlayerOrPet = victim->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+    // if (victim->GetTypeId() == TYPEID_PLAYER)
+    //     missChance += diff > 0 ? diff * 0.04f : diff * 0.02f;
+    // else
+    // {
+    //     missChance += diff > 10 ? 1 + (diff - 10) * 0.4f : diff * 0.1f;
+    //     float levelFactor = victim->GetLevelForTarget(this);
+    //     if (levelFactor < 10.f)
+    //         missChance *= (levelFactor / 10.f);
+    // }
+
+    // Defense/weapon skill factor: for players and NPCs
+    float factor = 0.04f;
+    // NPCs gain additional bonus to incoming hit chance reduction based on positive skill difference (same value as
+    // bonus parry rate)
+    if (!vsPlayerOrPet && diff > 0)
     {
-        missChance += diff > 10 ? 1 + (diff - 10) * 0.4f : diff * 0.1f;
-        float levelFactor = victim->GetLevelForTarget(this);
-        if (levelFactor < 10.f)
-            missChance *= (levelFactor / 10.f);
+        if (diff > 10)
+        {
+            // First 10 points of difference (2 levels): usual decrease
+            missChance += (10 * 0.1f);
+            diff -= 10;
+            // Each additional point of difference:
+            factor = 0.4f;
+            missChance += (diff * 0.2f); // Pre-WotLK: Additional 1% miss chance for each level (final @ 3% per level)
+        }
+        else
+            factor = 0.1f;
     }
+    missChance += (diff * factor);
 
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     float resistMissChance = 100.0f;
@@ -12423,16 +12528,9 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
     // @tswow-begin
     if (spellInfo)
     {
-        FIRE_ID(
-              spellInfo->events.id
-            , Spell,OnCalcMeleeMiss
-            , TSSpellInfo(spellInfo)
-            , TSMutableNumber<float>(&missChance)
-            , TSUnit(const_cast<Unit*>(this))
-            , TSUnit(const_cast<Unit*>(victim))
-            , attType
-            , skillDiff
-        );
+        FIRE_ID(spellInfo->events.id, Spell, OnCalcMeleeMiss, TSSpellInfo(spellInfo),
+                TSMutableNumber<float>(&missChance), TSUnit(const_cast<Unit*>(this)), TSUnit(const_cast<Unit*>(victim)),
+                attType, skillDiff);
     }
     // @tswow-end
 
