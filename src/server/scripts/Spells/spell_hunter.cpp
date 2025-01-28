@@ -149,59 +149,6 @@ class spell_hun_aspect_of_the_beast_pet : public AuraScript
     }
 };
 
-// 34074 - Aspect of the Viper
-class spell_hun_ascpect_of_the_viper : public AuraScript
-{
-    PrepareAuraScript(spell_hun_ascpect_of_the_viper);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo(
-        {
-            SPELL_HUNTER_ASPECT_OF_THE_VIPER_ENERGIZE,
-            SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER,
-            SPELL_HUNTER_VIPER_ATTACK_SPEED,
-            SPELL_HUNTER_VICIOUS_VIPER
-        });
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-
-        uint32 maxMana = GetTarget()->GetMaxPower(POWER_MANA);
-        int32 mana = CalculatePct(maxMana, GetTarget()->GetAttackTime(RANGED_ATTACK) / 1000.0f);
-
-        if (AuraEffect const* glyph = GetTarget()->GetAuraEffect(SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER, EFFECT_0))
-            AddPct(mana, glyph->GetAmount());
-
-        CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(mana);
-        GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_ASPECT_OF_THE_VIPER_ENERGIZE, args);
-    }
-
-    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        // Hunter T7 4P Bonus
-        if (GetTarget()->HasAura(SPELL_HUNTER_VIPER_ATTACK_SPEED))
-            GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_VICIOUS_VIPER, aurEff);
-    }
-
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        // Hunter T7 4P Bonus
-        if (GetTarget()->HasAura(SPELL_HUNTER_VIPER_ATTACK_SPEED))
-            GetTarget()->RemoveAurasDueToSpell(SPELL_HUNTER_VICIOUS_VIPER);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_hun_ascpect_of_the_viper::HandleProc, EFFECT_0, SPELL_AURA_OBS_MOD_POWER);
-        AfterEffectApply += AuraEffectApplyFn(spell_hun_ascpect_of_the_viper::OnApply, EFFECT_0, SPELL_AURA_OBS_MOD_POWER, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_hun_ascpect_of_the_viper::OnRemove, EFFECT_0, SPELL_AURA_OBS_MOD_POWER, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 // 53209 - Chimera Shot
 class spell_hun_chimera_shot : public SpellScript
 {
@@ -1369,7 +1316,6 @@ void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_aspect_of_the_beast);
     RegisterSpellScript(spell_hun_aspect_of_the_beast_pet);
-    RegisterSpellScript(spell_hun_ascpect_of_the_viper);
     RegisterSpellScript(spell_hun_chimera_shot);
     RegisterSpellScript(spell_hun_cobra_strikes);
     RegisterSpellScript(spell_hun_cobra_strikes_triggered);
