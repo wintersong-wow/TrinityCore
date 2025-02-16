@@ -1318,6 +1318,13 @@ void Spell::EffectHeal()
 
     int32 addhealth = damage;
 
+    // If the target is affected by "Healing Way", healed amount should increase.
+    if (AuraEffect const* aurEff = unitCaster->GetAuraEffect(81391, 0))
+    {
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x40)
+            addhealth *= (aurEff->GetAmount() + 100.0f) / 100.0f;
+    }
+
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
     if (m_spellInfo->Id == 45064)
