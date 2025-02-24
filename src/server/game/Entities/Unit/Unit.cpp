@@ -2338,8 +2338,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         return MELEE_HIT_CRIT;
 
     // 7. CRUSHING
-    // mobs can score crushing blows if they're 4 or more levels above victim
-    if (GetLevelForTarget(victim) >= victim->GetLevelForTarget(this) + 4 &&
+    // mobs can score crushing blows if they're 3 or more levels above victim
+    if (GetLevelForTarget(victim) >= victim->GetLevelForTarget(this) + 3 &&
         // can be from by creature (if can) or from controlled player that considered as creature
         !IsControlledByPlayer() &&
         !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS))
