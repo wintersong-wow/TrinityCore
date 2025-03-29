@@ -1411,7 +1411,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         // Refresh or add visual aura
                         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                        args.AddSpellMod(SPELLVALUE_AURA_STACK, sSpellMgr->AssertSpellInfo(74396)->StackAmount);
+                        args.AddSpellMod(SPELLVALUE_AURA_STACK, 1);
                         target->CastSpell(nullptr, 74396, args);
                         break;
                     }
