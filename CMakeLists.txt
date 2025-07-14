@@ -26,7 +26,7 @@ include(FetchContent)
 
 FetchContent_Declare(
   lua
-  GIT_REPOSITORY https://github.com/lua/lua
+  GIT_REPOSITORY https://github.com/lua/lua.git
   GIT_TAG v5.4.4
 )
 FetchContent_MakeAvailable(lua)
@@ -43,8 +43,8 @@ endif()
 #
 FetchContent_Declare(
   sol2
-  GIT_REPOSITORY https://github.com/ThePhD/sol2
-  GIT_TAG e8e122e9ce46f4f1c0b04003d8b703fe1b89755a
+  GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+  GIT_TAG 2b0d2fe8ba0074e16b499940c4f3126b9c7d3471
 )
 FetchContent_MakeAvailable (sol2)
 target_compile_definitions(sol2 INTERFACE SOL_NO_CHECK_NUMBER_PRECISION)
