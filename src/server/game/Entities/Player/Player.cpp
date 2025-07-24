@@ -7641,6 +7641,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 case ITEM_SUBCLASS_ARMOR_MAIL:
                 case ITEM_SUBCLASS_ARMOR_PLATE:
                 case ITEM_SUBCLASS_ARMOR_SHIELD:
+                case ITEM_SUBCLASS_ARMOR_BUCKLER:
                     modType = BASE_VALUE;
                 break;
             }

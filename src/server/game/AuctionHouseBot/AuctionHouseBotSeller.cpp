@@ -719,6 +719,7 @@ uint32 AuctionBotSeller::GetBuyModifier(ItemTemplate const* prototype)
                     return 700;
                 case ITEM_SUBCLASS_ARMOR_PLATE:
                 case ITEM_SUBCLASS_ARMOR_SHIELD:
+                case ITEM_SUBCLASS_ARMOR_BUCKLER:
                     return 800;
                 default:
                     return 400;

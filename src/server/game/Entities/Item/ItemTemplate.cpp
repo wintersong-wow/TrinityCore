@@ -143,7 +143,7 @@ uint32 ItemTemplate::GetSkill() const
 
     static uint32 const itemArmorSkills[MAX_ITEM_SUBCLASS_ARMOR] =
     {
-        0, SKILL_CLOTH, SKILL_LEATHER, SKILL_MAIL, SKILL_PLATE_MAIL, 0, SKILL_SHIELD, 0, 0, 0, 0
+        0, SKILL_CLOTH, SKILL_LEATHER, SKILL_MAIL, SKILL_PLATE_MAIL, SKILL_BUCKLER, SKILL_SHIELD, 0, 0, 0, 0
     };
 
     switch (Class)
