@@ -590,6 +590,7 @@ uint32 Item::GetSpell()
                 case ITEM_SUBCLASS_ARMOR_MAIL:     return 8737;
                 case ITEM_SUBCLASS_ARMOR_PLATE:    return  750;
                 case ITEM_SUBCLASS_ARMOR_SHIELD:   return 9116;
+                case ITEM_SUBCLASS_ARMOR_BUCKLER:  return 81610;
                 default: return 0;
             }
     }
