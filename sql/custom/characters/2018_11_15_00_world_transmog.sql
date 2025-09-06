@@ -15,5 +15,4 @@ CREATE TABLE IF NOT EXISTS `custom_transmogrification_sets` (
   INDEX `Owner` (`owner`)
 ) COLLATE = 'utf8_general_ci' ENGINE = InnoDB;
 
-ALTER TABLE `item_instance` ADD COLUMN `transmog` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `text`;
 ALTER TABLE `item_instance` ADD COLUMN `enchant` INT UNSIGNED NOT NULL DEFAULT '0';
