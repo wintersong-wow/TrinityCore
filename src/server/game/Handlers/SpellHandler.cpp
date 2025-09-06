@@ -684,14 +684,14 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
             else if (*itr == EQUIPMENT_SLOT_BACK && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
                 data << uint32(0);
             else if (Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
+            // @tswow-begin (Using Rochet2/Transmog)
             {
-                // @tswow-begin (Using Rochet2/Transmog)
-                if (auto const * itemTemplate = sObjectMgr->GetItemTemplate(item->transmog))
+                if (auto const* itemTemplate = sObjectMgr->GetItemTemplate(item->GetTransmog()))
                     data << uint32(itemTemplate->DisplayInfoID);
                 else
                     data << uint32(item->GetTemplate()->DisplayInfoID);
-                // @tswow-end
             }
+            // @tswow-end
             else
                 data << uint32(0);
         }
