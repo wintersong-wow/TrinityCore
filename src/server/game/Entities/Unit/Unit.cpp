@@ -1572,6 +1572,28 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     // Do effect if any damage done to target
     if (damageInfo->Damages[0].Damage + damageInfo->Damages[1].Damage)
     {
+        /* Refresh judgements on dealing damage if the attacker is a paladin player. */
+        if (GetTypeId() == TYPEID_PLAYER && damageInfo->Attacker->GetClass() == CLASS_PALADIN)
+        {
+            AuraApplicationMap& victimAuras = victim->GetAppliedAuras();
+            for (AuraApplicationMap::iterator i = victimAuras.begin(); i != victimAuras.end();)
+            {
+                Aura* aura = i->second->GetBase();
+                // Only refresh the judgements if the caster is also the attacker.
+                if (aura->GetCasterGUID() == damageInfo->Attacker->GetGUID())
+                {
+                    const SpellInfo* spellInfo = aura->GetSpellInfo();
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                        spellInfo->SpellFamilyFlags[2] == 0x00000400)
+                    {
+                        aura->RefreshDuration();
+                        break;
+                    }
+                }
+                ++i;
+            }
+        }
+
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vDamageShieldsCopy(victim->GetAuraEffectsByType(SPELL_AURA_DAMAGE_SHIELD));
