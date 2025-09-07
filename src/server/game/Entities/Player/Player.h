@@ -35,6 +35,7 @@
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
 // @tswow-begin (Using Rochet2/Transmog)
+#include "TransmogrificationDefines.h"
 #include "Transmogrification.h"
 // @tswow-end
 #include <memory>
@@ -159,15 +160,15 @@ struct SpellModifier
 };
 
 // @tswow-begin (Using Rochet2/Transmog)
-#ifdef PRESETS
-typedef std::map<uint8, uint32> PresetslotMapType;
+//#ifdef PRESETS
+typedef std::array<std::unordered_set<uint32>, TRANSMOG_TYPE_COUNT> AppearanceContainer;
 struct PresetData
 {
     std::string name;
-    PresetslotMapType slotMap; // slotMap[slotId] = entry
+    SetTransmogs data;
 };
-typedef std::map<uint8, PresetData> PresetMapType;
-#endif
+typedef std::map<uint8 /*presetid*/, PresetData> PresetMapType;
+//#endif
 // @tswow-end
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
@@ -758,6 +759,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS,
+    PLAYER_LOGIN_QUERY_LOAD_TRANSMOG,
+    PLAYER_LOGIN_QUERY_LOAD_TRANSMOG_SETS,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -2239,9 +2242,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::string GetCoordsMapAreaAndZoneString() const;
 
 // @tswow-begin (Using Rochet2/Transmog)
-#ifdef PRESETS
-        PresetMapType presetMap; // presetMap[presetId] = presetData
-#endif
+    //#ifdef PRESETS
+        BasicEvent* pendingTransmogCheck = nullptr;
+        AppearanceContainer transmogrification_appearances;
+        PresetMapType presetMap;
+    //#endif
 // @tswow-end
 
         std::string GetDebugInfo() const override;

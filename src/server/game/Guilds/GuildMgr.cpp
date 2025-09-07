@@ -354,7 +354,8 @@ void GuildMgr::LoadGuilds()
         QueryResult result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, "
                                                      //   11       12     13      14         15
                                                      // @tswow-begin (Using Rochet2/Transmog)
-                                                     "guildid, TabId, SlotId, item_guid, itemEntry, transmog FROM guild_bank_item gbi INNER JOIN item_instance ii ON gbi.item_guid = ii.guid");
+                                                    "guildid, TabId, SlotId, item_guid, itemEntry, transmog, enchant FROM "
+                                                    "guild_bank_item gbi INNER JOIN item_instance ii ON gbi.item_guid = ii.guid");
                                                      // @tswow-end
 
         if (!result)

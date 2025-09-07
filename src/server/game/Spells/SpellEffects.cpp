@@ -20,6 +20,7 @@
 #include "TSQuest.h"
 #include "TSEvents.h"
 #include "TSSpell.h"
+#include "Transmogrification.h"
 // @tswow-end
 #include "Spell.h"
 #include "AccountMgr.h"
@@ -2676,6 +2677,8 @@ void Spell::EffectEnchantItemPerm()
 
         item_owner->RemoveTradeableItem(itemTarget);
         itemTarget->ClearSoulboundTradeable(item_owner);
+
+        Transmogrification::instance().AddToCollection(item_owner, itemTarget);
     }
 }
 
