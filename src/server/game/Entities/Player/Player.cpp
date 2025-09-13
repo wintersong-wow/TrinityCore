@@ -24883,7 +24883,7 @@ void Player::ProcessTerrainStatusUpdate(ZLiquidStatus oldLiquidStatus, Optional<
 void Player::AtExitCombat()
 {
     Unit::AtExitCombat();
-    UpdatePotionCooldown();
+    //UpdatePotionCooldown();
 
     // @tswow-begin
     if (HasRunes())
