@@ -659,10 +659,17 @@ class spell_pri_mana_leech : public AuraScript
         return _procTarget != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(_procTarget, SPELL_PRIEST_MANA_LEECH_PROC, aurEff);
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(int32(damageInfo->GetDamage() * 2.5f));
+        GetTarget()->CastSpell(_procTarget, SPELL_PRIEST_MANA_LEECH_PROC, args);
     }
 
     void Register() override
